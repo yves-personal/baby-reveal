@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eine Ankündigung</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Jost:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background-color: #ffffff !important;
+    color: #111111 !important;
+    font-family: 'Jost', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .wrapper {
+    width: 100%;
+    max-width: 560px;
+    background-color: #ffffff;
+    color: #111111;
+  }
+
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* MASTHEAD */
+  .masthead { text-align: center; margin-bottom: 56px; }
+  .masthead-rule { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+  .masthead-rule::before, .masthead-rule::after { content: ''; flex: 1; height: 1px; background: #111111; opacity: 0.3; }
+  .masthead-vol { font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase; color: #555555; }
+  .masthead-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(2.4rem, 8vw, 4.2rem); font-weight: 300; line-height: 1; color: #111111; }
+  .masthead-title em { font-style: italic; }
+  .masthead-sub { font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.65rem; letter-spacing: 0.3em; text-transform: uppercase; color: #555555; margin-top: 10px; }
+
+  /* INTRO */
+  .intro-body { text-align: center; }
+  .intro-lede { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.15rem, 3vw, 1.45rem); font-weight: 300; line-height: 1.7; color: #111111; max-width: 400px; margin: 0 auto 48px; }
+  .intro-lede em { font-style: italic; }
+
+  /* GAME */
+  #game-area { display: none; }
+
+  .progress-bar-wrap { display: flex; gap: 4px; margin-bottom: 40px; }
+  .prog-seg { flex: 1; height: 1px; background: #cccccc; }
+  .prog-seg.done   { background: #111111; }
+  .prog-seg.active { background: #555555; }
+
+  .q-meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 24px; }
+  .q-label { font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; color: #555555; }
+  .q-timer { font-family: 'Cormorant Garamond', serif; font-size: 1.1rem; font-weight: 300; color: #555555; }
+  .q-timer.urgent { color: #aa2200; }
+
+  .question-text { font-family: 'Cormorant Garamond', serif; font-size: clamp(1.4rem, 4.5vw, 2rem); font-weight: 300; line-height: 1.45; color: #111111; margin-bottom: 40px; padding-bottom: 32px; border-bottom: 1px solid #dddddd; }
+
+  /* ANSWERS */
+  .answers { display: flex; flex-direction: column; }
+  .answer-btn { background: #ffffff; border: none; border-bottom: 1px solid #dddddd; padding: 18px 0; display: flex; align-items: baseline; gap: 20px; cursor: pointer; text-align: left; width: 100%; transition: background 0.15s, padding-left 0.15s; }
+  .answer-btn:first-child { border-top: 1px solid #dddddd; }
+  .answer-btn:hover:not(.disabled) { background: #f5f5f5; padding-left: 6px; }
+  .answer-letter { font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.6rem; letter-spacing: 0.2em; text-transform: uppercase; color: #888888; width: 18px; flex-shrink: 0; }
+  .answer-text { font-family: 'Cormorant Garamond', serif; font-size: clamp(1rem, 2.8vw, 1.2rem); font-weight: 300; line-height: 1.4; color: #111111; flex: 1; }
+  .answer-marker { font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.55rem; letter-spacing: 0.2em; color: #111111; flex-shrink: 0; visibility: hidden; }
+
+  .answer-btn.selected { background: #f0f0f0; padding-left: 6px; }
+  .answer-btn.selected .answer-text { font-style: italic; }
+  .answer-btn.correct { background: #f0f0f0; padding-left: 6px; }
+  .answer-btn.correct .answer-text { font-style: italic; }
+  .answer-btn.correct .answer-marker { visibility: visible; }
+  .answer-btn.wrong .answer-text { color: #aaaaaa; text-decoration: line-through; }
+  .answer-btn.wrong .answer-letter { color: #cccccc; }
+  .answer-btn.disabled { cursor: default; pointer-events: none; }
+
+  /* LIFELINES */
+  .lifelines { display: flex; gap: 24px; margin-top: 40px; padding-top: 24px; border-top: 1px solid #dddddd; }
+  .ll-btn { background: none; border: none; cursor: pointer; font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.6rem; letter-spacing: 0.25em; text-transform: uppercase; color: #555555; padding: 0; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+  .ll-btn:hover:not(.used) { color: #111111; }
+  .ll-btn.used { color: #cccccc; cursor: default; }
+
+  /* TOAST */
+  .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #111111; color: #ffffff; font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; padding: 12px 24px; border-radius: 2px; opacity: 0; pointer-events: none; transition: opacity 0.3s, transform 0.3s; z-index: 200; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* BUTTON */
+  .btn { display: inline-block; background: #111111; color: #ffffff; border: none; padding: 14px 40px; font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; cursor: pointer; border-radius: 1px; transition: background 0.2s; }
+  .btn:hover { background: #333333; }
+  .btn-ghost { background: #ffffff; color: #111111; border: 1px solid #cccccc; }
+  .btn-ghost:hover { background: #f5f5f5; }
+
+  /* WIN */
+  .win-eyebrow { font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.6rem; letter-spacing: 0.35em; text-transform: uppercase; color: #555555; margin-bottom: 20px; }
+  .win-headline { font-family: 'Cormorant Garamond', serif; font-size: clamp(2rem, 7vw, 3.5rem); font-weight: 300; line-height: 1.1; color: #111111; margin-bottom: 8px; }
+  .win-headline em { font-style: italic; }
+  .win-sub { font-family: 'Cormorant Garamond', serif; font-size: 1rem; font-style: italic; font-weight: 300; color: #555555; margin-bottom: 48px; }
+
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #dddddd; border: 1px solid #dddddd; margin-bottom: 48px; }
+  .stat-cell { background: #ffffff; padding: 28px 24px; }
+  .stat-cell.full { grid-column: 1 / -1; }
+  .stat-label-sm { font-family: 'Jost', sans-serif; font-weight: 300; font-size: 0.55rem; letter-spacing: 0.3em; text-transform: uppercase; color: #555555; margin-bottom: 8px; }
+  .stat-value-lg { font-family: 'Cormorant Garamond', serif; font-size: clamp(1rem, 3vw, 1.35rem); font-weight: 300; color: #111111; line-height: 1.3; }
+
+  .win-footer { display: flex; gap: 12px; justify-content: center; }
+
+  /* BOTANICAL */
+  .botanical-divider { display: flex; align-items: center; justify-content: center; margin: 32px 0; }
+  .botanical-divider svg { width: 180px; height: 40px; }
+
+  .botanical-corner {
+    position: fixed;
+    pointer-events: none;
+    opacity: 0.13;
+  }
+  .botanical-corner.tl { top: 0; left: 0; }
+  .botanical-corner.tr { top: 0; right: 0; transform: scaleX(-1); }
+  .botanical-corner.bl { bottom: 0; left: 0; transform: scaleY(-1); }
+  .botanical-corner.br { bottom: 0; right: 0; transform: scale(-1); }
+
+  .sprig { display: flex; justify-content: center; margin-bottom: 28px; }
+  .sprig svg { width: 64px; height: 64px; }
+
+  .win-flora {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .win-flora svg { width: 48px; height: 80px; opacity: 0.75; }
+
+  @keyframes sway {
+    0%   { transform: rotate(-8deg); transform-origin: bottom center; }
+    25%  { transform: rotate(6deg);  transform-origin: bottom center; }
+    50%  { transform: rotate(-5deg); transform-origin: bottom center; }
+    75%  { transform: rotate(9deg);  transform-origin: bottom center; }
+    100% { transform: rotate(-8deg); transform-origin: bottom center; }
+  }
+  .win-flora svg { animation: sway 2.5s ease-in-out infinite; }
+  .win-flora svg:nth-child(2) { animation-delay: 0.4s; animation-duration: 3s; }
+  .win-flora svg:nth-child(3) { animation-delay: 0.9s; animation-duration: 2.8s; }
+
+  @media (max-width: 400px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .stat-cell.full { grid-column: 1; }
+  }
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+<div class="wrapper">
+
+  <header class="masthead">
+    <div class="masthead-rule">
+      <span class="masthead-vol">Familie Plessen &nbsp;·&nbsp; Frühjahr 2026</span>
+    </div>
+    <h1 class="masthead-title">Eine <em>Ankündigung</em></h1>
+    <p class="masthead-sub">Baby-Enthüllung in drei Akten</p>
+    <div style="display:flex;justify-content:center;margin-top:20px;">
+      <svg width="120" height="34" viewBox="0 0 120 34" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.3;">
+        <line x1="60" y1="34" x2="60" y2="6" stroke="#111" stroke-width="0.8"/>
+        <line x1="60" y1="27" x2="44" y2="19" stroke="#111" stroke-width="0.7"/>
+        <ellipse cx="40" cy="17" rx="6" ry="3.5" transform="rotate(-30 40 17)" stroke="#111" stroke-width="0.7" fill="none"/>
+        <line x1="60" y1="20" x2="48" y2="13" stroke="#111" stroke-width="0.7"/>
+        <ellipse cx="44" cy="11" rx="5" ry="3" transform="rotate(-25 44 11)" stroke="#111" stroke-width="0.7" fill="none"/>
+        <line x1="60" y1="13" x2="52" y2="7" stroke="#111" stroke-width="0.7"/>
+        <ellipse cx="49" cy="5" rx="4.5" ry="2.5" transform="rotate(-20 49 5)" stroke="#111" stroke-width="0.7" fill="none"/>
+        <line x1="60" y1="27" x2="76" y2="19" stroke="#111" stroke-width="0.7"/>
+        <ellipse cx="80" cy="17" rx="6" ry="3.5" transform="rotate(30 80 17)" stroke="#111" stroke-width="0.7" fill="none"/>
+        <line x1="60" y1="20" x2="72" y2="13" stroke="#111" stroke-width="0.7"/>
+        <ellipse cx="76" cy="11" rx="5" ry="3" transform="rotate(25 76 11)" stroke="#111" stroke-width="0.7" fill="none"/>
+        <line x1="60" y1="13" x2="68" y2="7" stroke="#111" stroke-width="0.7"/>
+        <ellipse cx="71" cy="5" rx="4.5" ry="2.5" transform="rotate(20 71 5)" stroke="#111" stroke-width="0.7" fill="none"/>
+        <ellipse cx="60" cy="4" rx="3" ry="4" stroke="#111" stroke-width="0.7" fill="none"/>
+      </svg>
+    </div>
+  </header>
+
+  <div class="screen active" id="screen-intro">
+    <div class="intro-body">
+      <p class="intro-lede">Etwas Kleines ist angekommen.<br>Beantworte drei Fragen —<br>und du erfährst <em>alles.</em></p>
+      <button class="btn" onclick="startGame()">Beginnen</button>
+    </div>
+  </div>
+
+  <div id="game-area">
+    <div class="progress-bar-wrap" id="progress-bar"></div>
+    <div class="q-meta">
+      <span class="q-label" id="q-label">Frage I</span>
+      <span class="q-timer" id="q-timer">30</span>
+    </div>
+    <div class="question-text" id="question-text"></div>
+    <div class="answers" id="answers"></div>
+    <div class="lifelines">
+      <button class="ll-btn" id="ll-fifty"    onclick="useFiftyFifty()">½ &nbsp;50:50</button>
+      <button class="ll-btn" id="ll-phone"    onclick="usePhoneAFriend()">↗ &nbsp;Anruf</button>
+      <button class="ll-btn" id="ll-audience" onclick="useAudienceHelp()">◎ &nbsp;Publikum</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-win">
+    <div class="win-eyebrow">Glückwunsch — alle drei Antworten korrekt</div>
+    <h2 class="win-headline">Willkommen,<br><em>kleiner Florentin.</em></h2>
+    <p class="win-sub">Hier sind alle Details.</p>
+
+    <div class="win-flora">
+      <!-- plant 1: tall leafy stem -->
+      <svg viewBox="0 0 48 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="24" y1="80" x2="24" y2="8" stroke="#2d4a2d" stroke-width="1"/>
+        <path d="M24 62 Q12 52 8 42 Q18 44 24 56" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <path d="M24 50 Q36 40 40 30 Q30 32 24 44" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <path d="M24 38 Q13 28 10 18 Q20 21 24 33" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <path d="M24 26 Q35 16 38 6 Q28 9 24 21" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <circle cx="24" cy="7" r="4" stroke="#2d4a2d" stroke-width="0.8" fill="#d4e8d4"/>
+      </svg>
+      <!-- plant 2: branching botanical -->
+      <svg viewBox="0 0 48 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="24" y1="80" x2="24" y2="10" stroke="#2d4a2d" stroke-width="1"/>
+        <line x1="24" y1="55" x2="10" y2="38" stroke="#2d4a2d" stroke-width="0.8"/>
+        <ellipse cx="7" cy="35" rx="6" ry="4" transform="rotate(-20 7 35)" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <line x1="24" y1="55" x2="38" y2="40" stroke="#2d4a2d" stroke-width="0.8"/>
+        <ellipse cx="41" cy="37" rx="6" ry="4" transform="rotate(20 41 37)" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <line x1="24" y1="38" x2="13" y2="25" stroke="#2d4a2d" stroke-width="0.8"/>
+        <ellipse cx="10" cy="22" rx="5" ry="3.5" transform="rotate(-15 10 22)" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <line x1="24" y1="38" x2="35" y2="26" stroke="#2d4a2d" stroke-width="0.8"/>
+        <ellipse cx="38" cy="23" rx="5" ry="3.5" transform="rotate(15 38 23)" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <line x1="24" y1="22" x2="24" y2="10" stroke="#2d4a2d" stroke-width="0.8"/>
+        <circle cx="24" cy="8" r="5" stroke="#2d4a2d" stroke-width="0.8" fill="#d4e8d4"/>
+        <circle cx="24" cy="8" r="2" fill="#2d4a2d"/>
+      </svg>
+      <!-- plant 3: simple elegant frond -->
+      <svg viewBox="0 0 48 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="24" y1="80" x2="24" y2="8" stroke="#2d4a2d" stroke-width="1"/>
+        <path d="M24 65 Q36 55 40 44 Q30 47 24 58" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <path d="M24 52 Q12 42 8 31 Q18 34 24 46" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <path d="M24 40 Q36 30 39 19 Q29 22 24 35" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <path d="M24 28 Q13 18 10 7 Q20 10 24 23" stroke="#2d4a2d" stroke-width="0.8" fill="#e8f0e8"/>
+        <circle cx="24" cy="7" r="3.5" stroke="#2d4a2d" stroke-width="0.8" fill="#d4e8d4"/>
+      </svg>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-cell full">
+        <div class="stat-label-sm">Name</div>
+        <div class="stat-value-lg" id="stat-name"></div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label-sm">Geburtsdatum</div>
+        <div class="stat-value-lg" id="stat-dob"></div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label-sm">Uhrzeit</div>
+        <div class="stat-value-lg" id="stat-time"></div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label-sm">Größe</div>
+        <div class="stat-value-lg" id="stat-height"></div>
+      </div>
+      <div class="stat-cell">
+        <div class="stat-label-sm">Gewicht</div>
+        <div class="stat-value-lg" id="stat-weight"></div>
+      </div>
+    </div>
+    <p style="text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:0.9rem;color:#666;margin-bottom:32px;line-height:1.6;">
+      <em>Florentin</em> — vom Lateinischen <em>florens</em>:<br>der Blühende, der Gedeihende.
+    </p>
+    <div class="win-footer">
+      <button class="btn btn-ghost" onclick="restartGame()">Nochmal spielen</button>
+    </div>
+  </div>
+
+</div>
+<script>
+const BABY = {
+  name:   "Florentin Theodor Plessen",
+  dob:    "[DATUM EINTRAGEN]",
+  time:   "[UHRZEIT]",
+  height: "[XX cm]",
+  weight: "[X,XXX kg]"
+};
+const ROMAN = ['I','II','III'];
+const questions = [
+  {
+    text: "Wann erblickte das Baby das Licht der Welt?",
+    correct: BABY.dob,
+    options: [
+      { value: "753 v. Chr.",      hint: "Das war die Gründung Roms." },
+      { value: "9. November 1989", hint: "Das war der Fall der Berliner Mauer." },
+      { value: BABY.dob,           hint: null },
+      { value: "32. Februar",      hint: "Dieses Datum existiert nicht." }
+    ]
+  },
+  {
+    text: "Mit welchen Maßen kam das Baby auf die Welt?",
+    correct: BABY.height + " & " + BABY.weight,
+    options: [
+      { value: "1,989 × 10³⁰ kg",           hint: "Das ist die Masse der Sonne." },
+      { value: BABY.height + " & " + BABY.weight, hint: null },
+      { value: "177 cm & 87 kg",             hint: "Das ist Papa." },
+      { value: "148 kg",                     hint: "Das ist das Durchschnittsgewicht eines Sumoringers." }
+    ]
+  },
+  {
+    text: "Und schließlich — wie heißt das neue Familienmitglied?",
+    correct: "Florentin Theodor Plessen",
+    options: [
+      { value: "Dustin-Justin Plessen",               hint: null },
+      { value: "Constantin Yves Plessen Junior",       hint: null },
+      { value: "Florentin Theodor Plessen",            hint: null },
+      { value: "Dustinius-Justinus von Plessen-Habsburg", hint: null }
+    ]
+  }
+];
+
+let currentQ=0, selectedBtn=null, answered=false, timerInterval=null, timeLeft=30, hiddenOptions=[];
+
+function buildProgress() {
+  const bar = document.getElementById('progress-bar'); bar.innerHTML = '';
+  questions.forEach((_,i) => { const s=document.createElement('div'); s.className='prog-seg'+(i<currentQ?' done':i===currentQ?' active':''); bar.appendChild(s); });
+}
+function startTimer() {
+  timeLeft=30; updateTimer(); clearInterval(timerInterval);
+  timerInterval=setInterval(()=>{ timeLeft--; updateTimer(); if(timeLeft<=0){clearInterval(timerInterval);if(!answered)timeOut();}},1000);
+}
+function updateTimer() {
+  const el=document.getElementById('q-timer'); el.textContent=timeLeft; el.classList.toggle('urgent',timeLeft<=8);
+}
+function stopTimer(){clearInterval(timerInterval);}
+function timeOut(){ answered=true; showToast('Zeit abgelaufen'); revealCorrect(); setTimeout(()=>{currentQ=0;transition(renderQuestion);},2800); }
+
+function renderQuestion() {
+  answered=false; selectedBtn=null; hiddenOptions=[];
+  ['ll-fifty','ll-phone','ll-audience'].forEach(id=>document.getElementById(id).classList.remove('used'));
+  const q=questions[currentQ];
+  document.getElementById('q-label').textContent='Frage '+ROMAN[currentQ];
+  document.getElementById('question-text').textContent=q.text;
+  buildProgress();
+  const shuffled=[...q.options].sort(()=>Math.random()-0.5);
+  const letters=['A','B','C','D'];
+  const div=document.getElementById('answers'); div.innerHTML='';
+  shuffled.forEach((opt,i)=>{
+    const val = typeof opt === 'object' ? opt.value : opt;
+    const hint = typeof opt === 'object' ? opt.hint : null;
+    const btn=document.createElement('button'); btn.className='answer-btn'; btn.dataset.value=val;
+    if(hint) btn.dataset.hint=hint;
+    btn.innerHTML=`<span class="answer-letter">${letters[i]}</span><span class="answer-text">${val}</span><span class="answer-marker">✓ Korrekt</span>`;
+    btn.addEventListener('click',()=>selectAnswer(btn)); div.appendChild(btn);
+  });
+  startTimer();
+}
+function selectAnswer(btn) {
+  if(answered||hiddenOptions.includes(btn.dataset.value))return;
+  if(!selectedBtn){btn.classList.add('selected');selectedBtn=btn;return;}
+  if(selectedBtn===btn){confirmAnswer(btn);return;}
+  selectedBtn.classList.remove('selected'); btn.classList.add('selected'); selectedBtn=btn;
+}
+function confirmAnswer(btn) {
+  answered=true; stopTimer(); disableAll(); btn.classList.remove('selected');
+  const ok=btn.dataset.value===questions[currentQ].correct;
+  if(ok){
+    btn.classList.add('correct'); showToast('Korrekt');
+    setTimeout(()=>{ if(currentQ<questions.length-1){currentQ++;transition(renderQuestion);}else showWin();},1800);
+  } else {
+    btn.classList.add('wrong'); revealCorrect();
+    const hint = btn.dataset.hint;
+    const taunts = ['Alles ok?', 'Zu wenig Schlaf?', 'Yikes. Lies mehr.', 'Ernsthaft?', 'Das war knapp — nein, eigentlich nicht.'];
+    const taunt = taunts[Math.floor(Math.random()*taunts.length)];
+    if(hint) {
+      showToast(taunt, 2000);
+      setTimeout(()=>showToast(hint, 3200), 2200);
+      setTimeout(()=>{currentQ=0;transition(renderQuestion);}, 5800);
+    } else {
+      showToast(taunt, 2400);
+      setTimeout(()=>{currentQ=0;transition(renderQuestion);}, 3200);
+    }
+  }
+}
+function revealCorrect() {
+  const c=questions[currentQ].correct;
+  document.querySelectorAll('.answer-btn').forEach(b=>{if(b.dataset.value===c)b.classList.add('correct');});
+}
+function disableAll(){document.querySelectorAll('.answer-btn').forEach(b=>b.classList.add('disabled'));}
+function transition(cb) {
+  const ga=document.getElementById('game-area'); ga.style.transition='opacity 0.3s'; ga.style.opacity='0';
+  setTimeout(()=>{cb();ga.style.opacity='1';},300);
+}
+function useFiftyFifty() {
+  const el=document.getElementById('ll-fifty'); if(el.classList.contains('used')||answered)return; el.classList.add('used');
+  const c=questions[currentQ].correct;
+  [...document.querySelectorAll('.answer-btn')].filter(b=>b.dataset.value!==c&&!hiddenOptions.includes(b.dataset.value)).sort(()=>Math.random()-0.5).slice(0,2).forEach(b=>{hiddenOptions.push(b.dataset.value);b.style.visibility='hidden';});
+}
+function usePhoneAFriend() {
+  const el=document.getElementById('ll-phone'); if(el.classList.contains('used')||answered)return; el.classList.add('used');
+  let letter=''; document.querySelectorAll('.answer-btn').forEach(b=>{if(b.dataset.value===questions[currentQ].correct)letter=b.querySelector('.answer-letter').textContent;});
+  showToast('„Ich tippe auf Antwort '+letter+'"');
+}
+function useAudienceHelp() {
+  const el=document.getElementById('ll-audience'); if(el.classList.contains('used')||answered)return; el.classList.add('used');
+  showToast('Publikum: 87 % für die richtige Antwort');
+}
+let toastTimeout;
+function showToast(msg, dur){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastTimeout); toastTimeout=setTimeout(()=>t.classList.remove('show'), dur||2400); }
+function showWin() {
+  stopTimer();
+  ['name','dob','time','height','weight'].forEach(k=>document.getElementById('stat-'+k).textContent=BABY[k]);
+  const ga=document.getElementById('game-area'); ga.style.transition='opacity 0.4s'; ga.style.opacity='0';
+  setTimeout(()=>{ga.style.display='none';document.getElementById('screen-win').classList.add('active');},400);
+}
+function startGame() {
+  document.getElementById('screen-intro').classList.remove('active');
+  const ga=document.getElementById('game-area'); ga.style.display='block'; ga.style.opacity='0'; ga.style.transition='opacity 0.4s';
+  currentQ=0; renderQuestion(); setTimeout(()=>ga.style.opacity='1',50);
+}
+function restartGame() {
+  document.getElementById('screen-win').classList.remove('active');
+  const ga=document.getElementById('game-area'); ga.style.display='block'; ga.style.opacity='0'; ga.style.transition='opacity 0.4s';
+  currentQ=0; renderQuestion(); setTimeout(()=>ga.style.opacity='1',50);
+}
+</script>
+</body>
+</html>
