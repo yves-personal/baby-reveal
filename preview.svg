@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f7f4ef"/>
+
+  <!-- subtle grid lines -->
+  <line x1="0" y1="315" x2="1200" y2="315" stroke="#e8e4de" stroke-width="1"/>
+  <line x1="600" y1="0" x2="600" y2="630" stroke="#e8e4de" stroke-width="1"/>
+
+  <!-- top horizontal rule -->
+  <line x1="160" y1="110" x2="1040" y2="110" stroke="#1a1a18" stroke-width="0.8" opacity="0.2"/>
+  <!-- bottom horizontal rule -->
+  <line x1="160" y1="520" x2="1040" y2="520" stroke="#1a1a18" stroke-width="0.8" opacity="0.2"/>
+
+  <!-- LEFT botanical branch -->
+  <!-- main stem -->
+  <line x1="190" y1="580" x2="190" y2="80" stroke="#2d4a2d" stroke-width="1.2"/>
+  <!-- leaves left -->
+  <path d="M190 480 Q150 450 135 420 Q165 425 190 460" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <path d="M190 410 Q230 380 245 350 Q215 355 190 390" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <path d="M190 340 Q150 310 135 280 Q165 285 190 320" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <path d="M190 270 Q230 240 245 210 Q215 215 190 250" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <path d="M190 200 Q150 170 135 140 Q165 145 190 180" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <!-- top bud -->
+  <ellipse cx="190" cy="78" rx="6" ry="8" stroke="#2d4a2d" stroke-width="0.9" fill="#d4e8d4"/>
+
+  <!-- RIGHT botanical branch (mirrored) -->
+  <line x1="1010" y1="580" x2="1010" y2="80" stroke="#2d4a2d" stroke-width="1.2"/>
+  <path d="M1010 480 Q1050 450 1065 420 Q1035 425 1010 460" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <path d="M1010 410 Q970 380 955 350 Q985 355 1010 390" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <path d="M1010 340 Q1050 310 1065 280 Q1035 285 1010 320" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <path d="M1010 270 Q970 240 955 210 Q985 215 1010 250" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <path d="M1010 200 Q1050 170 1065 140 Q1035 145 1010 180" stroke="#2d4a2d" stroke-width="0.9" fill="#e8f0e8"/>
+  <ellipse cx="1010" cy="78" rx="6" ry="8" stroke="#2d4a2d" stroke-width="0.9" fill="#d4e8d4"/>
+
+  <!-- small center sprig above text -->
+  <line x1="600" y1="200" x2="600" y2="155" stroke="#2d4a2d" stroke-width="0.9"/>
+  <line x1="600" y1="190" x2="578" y2="172" stroke="#2d4a2d" stroke-width="0.7"/>
+  <ellipse cx="572" cy="169" rx="8" ry="4.5" transform="rotate(-30 572 169)" stroke="#2d4a2d" stroke-width="0.7" fill="#e8f0e8"/>
+  <line x1="600" y1="182" x2="580" y2="166" stroke="#2d4a2d" stroke-width="0.7"/>
+  <ellipse cx="575" cy="163" rx="7" ry="4" transform="rotate(-20 575 163)" stroke="#2d4a2d" stroke-width="0.7" fill="#e8f0e8"/>
+  <line x1="600" y1="190" x2="622" y2="172" stroke="#2d4a2d" stroke-width="0.7"/>
+  <ellipse cx="628" cy="169" rx="8" ry="4.5" transform="rotate(30 628 169)" stroke="#2d4a2d" stroke-width="0.7" fill="#e8f0e8"/>
+  <line x1="600" y1="182" x2="620" y2="166" stroke="#2d4a2d" stroke-width="0.7"/>
+  <ellipse cx="625" cy="163" rx="7" ry="4" transform="rotate(20 625 163)" stroke="#2d4a2d" stroke-width="0.7" fill="#e8f0e8"/>
+  <ellipse cx="600" cy="153" rx="5" ry="6" stroke="#2d4a2d" stroke-width="0.7" fill="#d4e8d4"/>
+
+  <!-- eyebrow text -->
+  <text x="600" y="245" font-family="Georgia, serif" font-size="13" fill="#8b7355" text-anchor="middle" letter-spacing="5">FAMILIE PLESSEN · FRÜHJAHR 2026</text>
+
+  <!-- main headline -->
+  <text x="600" y="330" font-family="Georgia, serif" font-size="72" font-weight="300" fill="#1a1a18" text-anchor="middle">Eine</text>
+  <text x="600" y="415" font-family="Georgia, serif" font-size="72" font-style="italic" font-weight="300" fill="#1a1a18" text-anchor="middle">Ankündigung</text>
+
+  <!-- subline -->
+  <text x="600" y="478" font-family="Georgia, serif" font-size="18" font-style="italic" font-weight="300" fill="#555555" text-anchor="middle">Baby-Enthüllung in drei Akten</text>
+
+  <!-- bottom rule with ornament -->
+  <line x1="380" y1="520" x2="555" y2="520" stroke="#1a1a18" stroke-width="0.6" opacity="0.25"/>
+  <circle cx="600" cy="520" r="3" fill="none" stroke="#1a1a18" stroke-width="0.7" opacity="0.3"/>
+  <line x1="645" y1="520" x2="820" y2="520" stroke="#1a1a18" stroke-width="0.6" opacity="0.25"/>
+
+  <!-- tagline -->
+  <text x="600" y="556" font-family="Georgia, serif" font-size="13" fill="#8b7355" text-anchor="middle" letter-spacing="3">KANNST DU ES ERRATEN?</text>
+</svg>
